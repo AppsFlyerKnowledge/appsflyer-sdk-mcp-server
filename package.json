@@ -1,6 +1,6 @@
 {
     "name": "@appsflyer/sdk-mcp-server",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "Node.js MCP server for AppsFlyer SDK integration",
     "main": "dist/server.js",
     "bin": {
@@ -11,7 +11,15 @@
         "start": "node dist/server.js",
         "dev": "ts-node src/server.ts"
     },
-    "author": "Your Name",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AppsFlyerKnowledge/appsflyer-sdk-mcp-server.git"
+    },
+    "homepage": "https://github.com/AppsFlyerKnowledge/appsflyer-sdk-mcp-server#readme",
+    "bugs": {
+        "url": "https://github.com/AppsFlyerKnowledge/appsflyer-sdk-mcp-server/issues"
+    },
+    "author": "AppsFlyer",
     "license": "MIT",
     "dependencies": {
         "@kubb/core": "^3.12.1",

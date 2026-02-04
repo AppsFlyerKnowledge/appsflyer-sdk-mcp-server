@@ -103,6 +103,7 @@ In your global \`Application\` class, import:
 
 \`\`\`java
 import com.appsflyer.AppsFlyerLib;
+import com.appsflyer.attribution.AppsFlyerRequestListener;
 \`\`\``,
 
       `**5. Add DebugLog before init**  

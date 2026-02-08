@@ -10,25 +10,41 @@ export function createDeepLink(server: McpServer) {
     title: "AppsFlyer OneLink Deep Link Setup Prompt",
     description: descriptions.createDeepLink,
     inputSchema: {
-      oneLinkUrl: z.string().url(),
-      uriScheme: z.string().optional(),
-      isDirect: z.boolean().optional(),
+      oneLinkUrl: z.string().url().optional(),
+      includeUriScheme: z.boolean().optional(),
     },
   },
   async (args) => {
     if (!args.oneLinkUrl) {
       return {
-        content: [{ type: "text", text: "Please enter your OneLink URL to get customized instructions." }],
+        content: [
+          {
+            type: "text",
+            text: "What is your OneLink URL?",
+          },
+        ],
       };
     }
-
-    const mode = args.isDirect === false ? "deferred" : "direct";
-
+    if (args.includeUriScheme === undefined) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: "Do you want to include a custom uriScheme? (yes/no)",
+          },
+        ],
+      };
+    }
     return {
       content: [
         {
           type: "text",
-          text: (steps.createDeepLink(args.uriScheme != null, mode === "direct") ?? []).join('\n\n'),
+          text: (
+            steps.createDeepLink(
+              new URL(args.oneLinkUrl).hostname,
+              args.includeUriScheme
+            ) ?? []
+          ).join('\n\n'),
         },
       ],
     };

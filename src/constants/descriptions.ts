@@ -85,28 +85,14 @@ Use this tool whenever the user wants to verify whether a specific in-app event 
 `,
 
 createDeepLink: `
-Use this tool to set up AppsFlyer OneLink Deep Linking (Direct or Deferred) in your Android app.
+Use this tool to set up AppsFlyer OneLink Deep Linking in your Android app.
 
-Guide the user through setting up AppsFlyer OneLink Deep Linking for Android by prompting for:
+Guide the user through setting up AppsFlyer OneLink Deep Linking for Android by first asking:
 - Their OneLink URL (tell them to get it from marketing if unknown).
-- Whether they want to include a custom uriScheme.
-- Whether they are implementing Direct or Deferred Deep Linking.
+- Whether they want to include a custom uriScheme (yes/no).
 
-If Direct Deep Link:
-- Instruct to integrate the AppsFlyer SDK if not already done.
-- Add an intent-filter for the OneLink domain in AndroidManifest.xml.
-- Optionally add a second intent-filter for a custom uriScheme.
-- Generate a SHA256 signature using the keystore (debug or production).
-- Provide exact keytool command and example output.
-- Send the SHA256 to marketing for OneLink template configuration.
-- Import required libraries and subscribe to AppsFlyer DeepLinkListener with full Java code example.
-- Launch the app on a device or emulator.
-- Run the tool **verifyDeepLink** to validate behavior.
-
-If Deferred Deep Link:
-- Provide full Java code for the DeepLinkListener only.
-- Instruct user to implement handling for both direct and deferred deep links inside the callback.
-- Launch the app and verify behavior with **verifyDeepLink**.
+After setup, ask the user whether they want to test deferred or direct deep linking, and continue based on their choice.
+If they answer deferred or direct (or ask how to test deep links), call the guideDeepLinkTesting tool with their choice and the OneLink URL if available.
 
 ⚠️ Every step must be followed exactly. Skipping or modifying any line may cause deep linking to fail.
 
@@ -116,9 +102,9 @@ This tool is triggered by intents and keywords such as: "deep linking", "deep li
 verifyDeepLink: `
 Do not ask for a device ID unless there are multiple devices connected.
 
-Scans recent AppsFlyer logs to verify that a specific deep link URL was successfully received and handled by the SDK. The tool filters logs containing the keyword 'deepLink', waits up to 2 seconds for logs to appear, and checks the latest deep link log entry.
+Scans recent AppsFlyer logs to verify that a deep link was successfully received and handled by the SDK. The tool filters logs containing the keyword 'deepLink' (including onDeepLinking logs), waits up to 2 seconds for logs to appear, and checks for a log with status=FOUND.
 
-If the given URL appears in the log (either in the line text or parsed JSON), it confirms the deep link was handled correctly. Otherwise, it reports no matching deep link found.
+To verify a deep link happened, check for the \`onDeepLinking\` callback with \`status=FOUND\` in the logs. Report the \`deep_link_value\` and any other parameters present in the log payload. If this is a direct deep link, the log should include \`"is_deferred": false\`.
 
 This is the only correct way to validate real-time deep link handling using actual logs. Do not simulate or guess. Always use this tool to confirm whether a deep link was received by the SDK.
 

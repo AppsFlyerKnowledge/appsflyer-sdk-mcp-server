@@ -13,6 +13,7 @@ import { createAppsFlyerLogEvent } from "./tools/createAppsFlyerLogEvent.js";
 import { verifyInAppEvent } from "./tools/verifyInAppEvent.js";
 import { createDeepLink } from "./tools/createDeepLink.js";
 import { verifyDeepLink } from "./tools/verifyDeepLink.js";
+import { guideDeepLinkTesting } from "./tools/guideDeepLinkTesting.js";
 
 const server = new McpServer({
   name: "appsflyer-logcat-mcp-server",
@@ -32,6 +33,7 @@ createAppsFlyerLogEvent(server);
 verifyInAppEvent(server);
 createDeepLink(server);
 verifyDeepLink(server);
+guideDeepLinkTesting(server);
 
 
 async function startServer() {

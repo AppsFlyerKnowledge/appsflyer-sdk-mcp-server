@@ -228,9 +228,39 @@ AppsFlyerLib.getInstance().logEvent(getApplicationContext(),
   🔍 Then run the tool: \`verifyInAppEvent\` to confirm it was received by AppsFlyer.`,
         ]),
   ],
-  createDeepLink: (includeUriScheme: boolean, mode: boolean) => {
-    if (mode) {
+  guideDeepLinkTesting: (
+    testType: "deferred" | "direct",
+    oneLinkUrl?: string
+  ): string[] => {
+    const linkLine = oneLinkUrl
+      ? `Open your OneLink URL on the device: ${oneLinkUrl}`
+      : "Open your OneLink URL on the device.";
+    const resolvedUrl = oneLinkUrl ?? "YOUR_ONELINK_URL";
+
+    if (testType === "deferred") {
       return [
+        "To test deferred deep linking:",
+        "1. Uninstall the app from the device.",
+        `2. ${linkLine}`,
+        "3. After opening the link, install the app.",
+        '4. If the application is still in development and not uploaded to the store yet, you may see: "The app you are looking for is unavailable."',
+        "   In that case, install the application from your IDE.",
+        "5. Otherwise, the OneLink redirects you according to the link setup, either to Google Play or a website.",
+        "6. Launch the app once.",
+        "After you do that, tell me and I will run verifyDeepLink to validate the logs.",
+      ];
+    }
+
+    return [
+      "To test direct deep linking:",
+      "1. Ensure marketing added your SHA256 to the OneLink template (required for direct links).",
+      "2. Install the app first (direct deep links only work when the app is already installed).",
+      "3. Open the OneLink URL on the device.",
+      "After you do that, tell me and I will run verifyDeepLink to confirm the callback and is_deferred=false.",
+    ];
+  },
+  createDeepLink: (oneLinkDomain: string, includeUriScheme: boolean) => {
+    return [
 `🚨 Do not skip. Follow **every** step exactly as shown. Copy-paste as is. Missing even one line will break the deep link.`,
         `1. Make sure the AppsFlyer SDK is integrated in your app.`,
         `2. Add the following code to your AndroidManifest.xml file:

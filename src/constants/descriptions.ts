@@ -124,6 +124,16 @@ This is the only correct way to validate real-time deep link handling using actu
 
 Use this tool whenever the user wants to verify deep link handling, triggered by keywords or intents like: "deeplink", "verify", "appsFlyer", "flow", or "handled".
 `
+,
+guideDeepLinkTesting: `
+Provide step-by-step instructions to test deferred or direct deep linking.
+
+Use this tool whenever the user asks how to test deferred/direct deep links, or when they respond with "deferred" or "direct" after deep link setup.
+
+Always include the OneLink URL in the steps if the user provided it earlier.
+
+Once deferred deep link testing and verification finish, ask if they want to test direct deep linking next.
+`
 };
 
 

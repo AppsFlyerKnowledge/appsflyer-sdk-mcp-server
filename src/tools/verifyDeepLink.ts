@@ -65,6 +65,10 @@ export function verifyDeepLink(server: McpServer) {
 
         const logs = getParsedAppsflyerFilters(DEEPLINK_KEYWORD);
         const allLogs = getParsedAppsflyerFilters();
+        const sinceMs = Date.now() - 5 * 60 * 1000;
+        const recentLogs = logs.filter(
+          (log) => log.timestampMs && log.timestampMs >= sinceMs
+        );
 
         if (!logs.length) {
           if (!allLogs.length) {
@@ -86,14 +90,28 @@ export function verifyDeepLink(server: McpServer) {
                 type: "text",
                 text:
                   "❌ No deep link logs found. AppsFlyer logs are present, so the SDK is running, but deep link integration might be missing or the test wasn't executed.\n\n" +
-                  "Confirm deep link setup (createDeepLink), then ask me to verify again.",
+                  "Confirm deep link setup, then ask me to verify again.",
               },
             ],
           };
         }
 
-        const latestLog = logs[logs.length - 1];
-        const foundLog = [...logs]
+        if (!recentLogs.length) {
+          return {
+            content: [
+              {
+                type: "text",
+                text:
+                  "❌ No deep link logs from the last 5 minutes were found.\n\n" +
+                  "Deep link verification only works after the full flow: integrate deep linking → run a deep link test → verify.\n" +
+                  "If any step was skipped or done out of order, the verification can fail.",
+              },
+            ],
+          };
+        }
+
+        const latestLog = recentLogs[recentLogs.length - 1];
+        const foundLog = [...recentLogs]
           .reverse()
           .find((log) => getStringField(log.json, STATUS_KEY) === "FOUND");
 

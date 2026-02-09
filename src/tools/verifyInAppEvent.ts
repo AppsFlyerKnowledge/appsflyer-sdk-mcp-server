@@ -33,6 +33,10 @@ export function verifyInAppEvent(server: McpServer) {
         }
 
         const logs = getParsedAppsflyerFilters(INAPP_KEYWORD);
+        const sinceMs = Date.now() - 5 * 60 * 1000;
+        const recentLogs = logs.filter(
+          (log) => log.timestampMs && log.timestampMs >= sinceMs
+        );
 
         if (!logs.length) {
           return {
@@ -45,7 +49,18 @@ export function verifyInAppEvent(server: McpServer) {
           };
         }
 
-        const latestLog = logs[logs.length - 1];
+        if (!recentLogs.length) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `❌ No in-app event logs from the last 5 minutes were found.`,
+              },
+            ],
+          };
+        }
+
+        const latestLog = recentLogs[recentLogs.length - 1];
 
         const eventInLog = latestLog.json?.eventName === eventName;
 

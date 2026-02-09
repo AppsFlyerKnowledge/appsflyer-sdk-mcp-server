@@ -45,17 +45,24 @@ export function verifyAppsFlyerSdk(server: McpServer): void {
 
       const conversionLogs = getParsedAppsflyerFilters("CONVERSION-");
       const launchLogs = getParsedAppsflyerFilters("LAUNCH-");
+      const sinceMs = Date.now() - 5 * 60 * 1000;
+      const recentConversionLogs = conversionLogs.filter(
+        (log) => log.timestampMs && log.timestampMs >= sinceMs
+      );
+      const recentLaunchLogs = launchLogs.filter(
+        (log) => log.timestampMs && log.timestampMs >= sinceMs
+      );
 
       const relevantLog =
-        conversionLogs[conversionLogs.length - 1] ||
-        launchLogs[launchLogs.length - 1];
+        recentConversionLogs[recentConversionLogs.length - 1] ||
+        recentLaunchLogs[recentLaunchLogs.length - 1];
 
       if (!relevantLog) {
         return {
           content: [
             {
               type: "text",
-              text: `❌ Failed to find any CONVERSION- or LAUNCH- log with uid.`,
+              text: `❌ No CONVERSION- or LAUNCH- logs from the last 5 minutes were found.`,
             },
           ],
         };

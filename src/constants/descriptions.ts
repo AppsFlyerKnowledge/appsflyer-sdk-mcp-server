@@ -82,7 +82,7 @@ Keyword triggers include: "apps flyer event", "generate java code from json", "a
 verifyInAppEvent: `
 Do not ask for a device ID unless there are multiple devices connected.
 
-Scans recent AppsFlyer logs to verify that a specific in-app event was successfully triggered by the SDK. The tool filters only in-app logs (with keyword 'INAPP-'), waits up to 2 seconds for logs to arrive, and extracts the most recent one. It then checks if the specified event name appears in the eventName field or log line. If found — it confirms the event was sent. If not — it reports failure.
+Scans recent AppsFlyer logs to verify that a specific in-app event was successfully sent by the SDK using a 2-step correlation model. First, it parses INAPP "preparing data" logs to capture readable payload fields (eventName, eventValue, etc.) and stores task_id. Then it confirms send success only if the same task has the success marker "execution finished ... result: SUCCESS". It reports success only when both steps are present.
 
 This is the only correct method to validate in-app events based on real logs. Do not simulate or infer. Always use this tool to confirm whether an event actually fired.
 

@@ -3,10 +3,23 @@ import { z } from "zod";
 import { startLogcatStream } from "../logcat/stream.js";
 import { getParsedAppsflyerFilters } from "../logcat/parse.js";
 import { descriptions } from "../constants/descriptions.js";
+import { getLatestDeepLinkExpectedData } from "../state/deepLinkState.js";
 
 const APPSFLYER_PREFIX = "AppsFlyer_";
 const DEEPLINK_KEYWORD = "deepLink";
 const STATUS_KEY = "status";
+const COMPARABLE_KEYS = [
+  "deep_link_value",
+  "deep_link_sub1",
+  "af_sub1",
+  "af_sub2",
+  "af_sub3",
+  "af_sub4",
+  "af_sub5",
+  "campaign",
+  "media_source",
+  "is_deferred",
+] as const;
 
 function getStringField(
   json: Record<string, any> | undefined,
@@ -37,6 +50,30 @@ function parseDeepLinkJson(value: unknown): Record<string, any> | undefined {
   } catch {
     return undefined;
   }
+}
+
+function normalizeToComparable(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function getFieldFromSources(
+  key: string,
+  ...sources: Array<Record<string, unknown> | undefined>
+): unknown {
+  for (const source of sources) {
+    if (!source) continue;
+    if (key in source) {
+      return source[key];
+    }
+  }
+  return undefined;
 }
 
 export function verifyDeepLink(server: McpServer) {
@@ -151,17 +188,62 @@ export function verifyDeepLink(server: McpServer) {
           af_sub4: getDeepLinkString("af_sub4") ?? "",
           af_sub5: getDeepLinkString("af_sub5") ?? "",
           deep_link_sub1: getDeepLinkString("deep_link_sub1") ?? "",
+          campaign: getDeepLinkString("campaign") ?? "",
+          media_source: getDeepLinkString("media_source") ?? "",
         };
+        const expectedDataState = getLatestDeepLinkExpectedData();
+        const expectedPayload = expectedDataState?.payload;
+        const receivedPayload: Record<string, unknown> = {
+          ...deepLinkPayload,
+          ...(foundLog.json ?? {}),
+        };
+        const comparisons = COMPARABLE_KEYS
+          .map((key) => {
+            const expected = normalizeToComparable(
+              getFieldFromSources(key, expectedPayload)
+            );
+            const received = normalizeToComparable(
+              getFieldFromSources(key, receivedPayload)
+            );
+            const included = expected !== "";
+            const matches = included ? expected === received : true;
+            return { key, expected, received, included, matches };
+          })
+          .filter((item) => item.included);
+        const mismatches = comparisons.filter((item) => !item.matches);
+        const hasExpectedData = Boolean(expectedPayload);
         const deferredNote =
           isDeferred === false
             ? "\n\nDirect deep link detected (is_deferred: false)."
             : "";
+        const expectedInfo = hasExpectedData
+          ? `Expected values source: ${expectedDataState?.oneLinkUrl ?? "latest createDeepLink payload"}`
+          : "Expected values source: not available (run createDeepLink with a valid OneLink URL first).";
+        const comparisonInfo = hasExpectedData
+          ? comparisons.length
+            ? mismatches.length
+              ? `❌ Expected/received comparison failed.\nMismatches:\n${JSON.stringify(
+                  mismatches,
+                  null,
+                  2
+                )}`
+              : `✅ Expected/received comparison passed for keys:\n${JSON.stringify(
+                  comparisons.map((item) => item.key),
+                  null,
+                  2
+                )}`
+            : "⚠️ No comparable expected keys were found in stored OneLink data."
+          : "⚠️ Skipping expected/received comparison because expected data is unavailable.";
+        const verificationPassed = status === "FOUND" && (hasExpectedData ? mismatches.length === 0 : true);
+        const verificationPrefix = verificationPassed
+          ? "✅ Deep link verification passed."
+          : "❌ Deep link verification failed.";
 
         return {
           content: [
             {
               type: "text",
-              text: `✅ Deep link was successfully received (status=FOUND).\n\nSummary:\n${JSON.stringify(
+              text: `${verificationPrefix}\n\nStatus check: ${status === "FOUND" ? "✅ status=FOUND" : `❌ status=${status ?? "UNKNOWN"}`}\n${comparisonInfo}\n\n${expectedInfo}\n\nSummary:\n${JSON.stringify(
                 summary,
                 null,
                 2

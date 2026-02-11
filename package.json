@@ -1,15 +1,15 @@
 {
     "name": "@appsflyer/sdk-mcp-server",
-    "version": "1.0.9",
+    "version": "1.1.0",
     "description": "Node.js MCP server for AppsFlyer SDK integration",
     "main": "dist/server.js",
     "bin": {
         "sdk-mcp-server": "./dist/server.js"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "npx tsc",
         "start": "node dist/server.js",
-        "dev": "ts-node src/server.ts"
+        "dev": "npx ts-node src/server.ts"
     },
     "repository": {
         "type": "git",

@@ -117,6 +117,7 @@ export function createDeepLink(server: McpServer) {
     title: "AppsFlyer OneLink Deep Link Setup Prompt",
     description: descriptions.createDeepLink,
     inputSchema: {
+      sdkIntegrated: z.boolean().optional(),
       oneLinkUrl: z.string().url().optional(),
       devKey: z.string().optional(),
       includeUriScheme: z.boolean().optional(),
@@ -124,6 +125,28 @@ export function createDeepLink(server: McpServer) {
     },
   },
   async (args) => {
+    if (args.sdkIntegrated === undefined) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: "Before setting up deep links, have you already integrated the AppsFlyer SDK in your app? (yes/no)",
+          },
+        ],
+      };
+    }
+    if (!args.sdkIntegrated) {
+      return {
+        content: [
+          {
+            type: "text",
+            text:
+              "Please integrate the AppsFlyer SDK first by running `integrateAppsFlyerSdk`. " +
+              "After integration is complete, come back and I will continue the deep link flow.",
+          },
+        ],
+      };
+    }
     if (!args.oneLinkUrl) {
       return {
         content: [

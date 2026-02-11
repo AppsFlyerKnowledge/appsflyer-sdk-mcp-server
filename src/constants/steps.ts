@@ -382,8 +382,8 @@ public class ExampleApp extends Application {
 ✅ **Done!**  
 Deep link setup is complete.
 
-Next step: do you want to test **deferred** deep linking or **direct** deep linking?  
-Reply with "deferred" or "direct" and I will guide you.`,
+Suggested next step (optional): test deep linking.
+If you want guidance, ask to test **deferred** deep linking or **direct** deep linking.`,
     ];
   }
 }  

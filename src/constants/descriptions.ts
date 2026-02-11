@@ -6,6 +6,9 @@ export const descriptions = {
   
   Before generating any output, you MUST ask the user if they need to use a response listener. Based on their answer, select the appropriate steps variant (with or without response listener).
   
+  Implementation preference:
+  After the user answers the response-listener question and this tool starts, the agent should implement the integration directly in the user's Android project files whenever possible. Prefer making the required end-to-end updates (Gradle dependencies, AndroidManifest permissions, Application class init/start logic, and listener variant when selected) rather than leaving copy/paste-only guidance.
+  
   Once integration is complete, suggest running the verifyAppsFlyerSdk tool to validate the setup and confirm the SDK is working properly.
   
   IMPORTANT: Before suggesting verifyAppsFlyerSdk, ensure the user launches the app on a device at least once to trigger the SDK and generate logs. Do NOT suggest verification unless the app has already been launched.
@@ -69,6 +72,8 @@ Never explain or simulate test output. This tool extracts appId and uid automati
 createAppsFlyerLogEvent: `
 Generate Java code to log AppsFlyer in-app events. You will first be asked whether you want to use JSON input (via file search, paste, or file path), or to manually specify the event name and parameters. Then, you will be guided step-by-step.
 
+Before any event-flow questions, ask the user if the AppsFlyer SDK is already integrated. If not integrated, stop and direct them to run integrateAppsFlyerSdk first. If integrated, continue the normal in-app event flow.
+
 This tool handles requests related to: asking the user if they want to use JSON or manual input before starting, generating Java code for logging AppsFlyer in-app events, creating AppsFlyer event logging code from JSON definitions or manual input, providing AppsFlyer event JSON input via search, file path, or paste methods, and generating AppsFlyer event code with or without a response listener.
 
 Keyword triggers include: "apps flyer event", "generate java code from json", "apps flyer json", "search json files", and "create appsflyer log event".
@@ -88,11 +93,15 @@ createDeepLink: `
 Use this tool to set up AppsFlyer OneLink Deep Linking in your Android app.
 
 Guide the user through setting up AppsFlyer OneLink Deep Linking for Android by first asking:
+- Whether AppsFlyer SDK was already integrated (yes/no). If not integrated, stop and direct them to integrateAppsFlyerSdk first. If integrated, continue setup.
 - Their OneLink URL (tell them to get it from marketing if unknown).
 - Whether they want to include a custom uriScheme (yes/no).
 
-After setup, ask the user whether they want to test deferred or direct deep linking, and continue based on their choice.
-If they answer deferred or direct (or ask how to test deep links), call the guideDeepLinkTesting tool with their choice and the OneLink URL if available.
+Focus this tool only on setup instructions and required code/config changes.
+Do not ask the user to choose deferred vs direct testing during setup.
+If the user explicitly asks how to test deep links, or responds with "deferred" / "direct" after setup is done, call the guideDeepLinkTesting tool with their choice and the OneLink URL if available.
+At the end of setup, you may suggest deep link testing as an optional next step (without forcing a choice question).
+Avoid telling the user to "launch the app" immediately after deep link setup.
 
 ⚠️ Every step must be followed exactly. Skipping or modifying any line may cause deep linking to fail.
 

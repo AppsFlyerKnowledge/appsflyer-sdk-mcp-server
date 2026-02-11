@@ -12,6 +12,7 @@ export function createAppsFlyerLogEvent(server: McpServer): void {
       title: "Create AppsFlyer Log Event",
       description: descriptions.createAppsFlyerLogEvent,
       inputSchema: {
+        sdkIntegrated: z.boolean().optional().describe("Whether AppsFlyer SDK is already integrated"),
         inputChoice: z.string().optional().describe("User input choice: '1' for JSON, '2' for manual input"),
         useJsonInput: z.boolean().optional().describe("Whether to use JSON input for event definitions"),
 
@@ -36,6 +37,17 @@ export function createAppsFlyerLogEvent(server: McpServer): void {
       // Helper to prompt the user with text
       const ask = (text: string) =>
         ({ content: [{ type: "text", text, _meta: {} }], _meta: {} }) as any;
+
+      if (args.sdkIntegrated === undefined) {
+        return ask(
+          "Before creating in-app event code, have you already integrated the AppsFlyer SDK in your app? (yes/no)"
+        );
+      }
+      if (!args.sdkIntegrated) {
+        return ask(
+          "Please integrate the AppsFlyer SDK first using `integrateAppsFlyerSdk`. After that, I will continue the in-app event flow."
+        );
+      }
 
       // Step 0: Ask user for input choice if not specified
       if (args.useJsonInput === undefined && args.inputChoice === undefined) {

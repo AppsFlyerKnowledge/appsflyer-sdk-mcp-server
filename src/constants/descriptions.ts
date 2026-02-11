@@ -6,6 +6,9 @@ export const descriptions = {
   
   Before generating any output, you MUST ask the user if they need to use a response listener. Based on their answer, select the appropriate steps variant (with or without response listener).
   
+  Implementation preference:
+  After the user answers the response-listener question and this tool starts, the agent should implement the integration directly in the user's Android project files whenever possible. Prefer making the required end-to-end updates (Gradle dependencies, AndroidManifest permissions, Application class init/start logic, and listener variant when selected) rather than leaving copy/paste-only guidance.
+  
   Once integration is complete, suggest running the verifyAppsFlyerSdk tool to validate the setup and confirm the SDK is working properly.
   
   IMPORTANT: Before suggesting verifyAppsFlyerSdk, ensure the user launches the app on a device at least once to trigger the SDK and generate logs. Do NOT suggest verification unless the app has already been launched.

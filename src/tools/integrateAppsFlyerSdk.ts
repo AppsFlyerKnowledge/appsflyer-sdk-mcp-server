@@ -85,11 +85,14 @@ export function integrateAppsFlyerSdk(server: McpServer): void {
         return updated;
       });
 
+      const executionPrefix =
+        "Prefer applying the following integration steps directly in the user's Android project files whenever possible, instead of leaving copy/paste-only guidance.";
+
       return {
         content: [
           {
             type: "text",
-            text: stepsWithReplacements.join("\n\n"),
+            text: `${executionPrefix}\n\n${stepsWithReplacements.join("\n\n")}`,
           },
         ],
       };

@@ -1,7 +1,8 @@
 export const steps = {
   integrateAppsFlyerSdk: {
     regular: [
-      `⚠️ Use exactly as written below. Do not modify.\n`,
+      `⚠️ Use exactly as written below. Do not modify.
+Apply these changes directly in the user's Android project files (do not ask the user to copy/paste).\n`,
 
       `**1. Declare repositories**  
 In the **Project** \`build.gradle\` file, declare the \`mavenCentral()\` repository:
@@ -69,7 +70,8 @@ Run the **verifyAppsFlyerSdk** tool to confirm the integration was successful an
     ],
 
     withResponseListener: [
-      `⚠️ Use exactly as written below. Do not modify.\n`,
+      `⚠️ Use exactly as written below. Do not modify.
+Apply these changes directly in the user's Android project files (do not ask the user to copy/paste).\n`,
 
       `**1. Declare repositories**  
 In the **Project** \`build.gradle\` file, declare the \`mavenCentral()\` repository:

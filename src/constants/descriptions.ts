@@ -103,7 +103,8 @@ If the user explicitly asks how to test deep links, or responds with "deferred" 
 At the end of setup, you may suggest deep link testing as an optional next step (without forcing a choice question).
 Avoid telling the user to "launch the app" immediately after deep link setup.
 
-⚠️ Every step must be followed exactly. Skipping or modifying any line may cause deep linking to fail.
+⚠️ CRITICAL: Every step must be followed exactly. Skipping or modifying any line may cause deep linking to fail.
+⚠️ DO NOT modify the AndroidManifest.xml code provided by this tool. Use it exactly as shown. Do NOT add android:pathPrefix. Do NOT remove android:autoVerify. The manifest XML is correct as provided.
 
 This tool is triggered by intents and keywords such as: "deep linking", "deep link", "deeplink", "deep-link", "app deep link", "android deep link", "deep link verification", "appsflyer onelink", "app links", "uriScheme", "intent-filter".
 `,

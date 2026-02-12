@@ -265,7 +265,7 @@ AppsFlyerLib.getInstance().logEvent(getApplicationContext(),
     return [
 `🚨 Do not skip. Follow **every** step exactly as shown. Copy-paste as is. Missing even one line will break the deep link.`,
       `1. Make sure the AppsFlyer SDK is integrated in your app.`,
-      `2. Add the following code to your AndroidManifest.xml file:
+      `2. Add the following code to your AndroidManifest.xml file **EXACTLY as shown below. Do NOT modify it. Do NOT add android:pathPrefix. Do NOT remove android:autoVerify. Use it exactly as provided:**
 \`\`\`xml
 <intent-filter android:autoVerify="true">
     <action android:name="android.intent.action.VIEW" />

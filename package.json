@@ -1,6 +1,6 @@
 {
     "name": "@appsflyer/sdk-mcp-server",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "Node.js MCP server for AppsFlyer SDK integration",
     "main": "dist/server.js",
     "bin": {

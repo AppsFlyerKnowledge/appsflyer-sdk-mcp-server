@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import http from "node:http";
 import https from "node:https";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -6,7 +5,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 type SessionStatus = "success" | "error";
 
 interface SessionEventPayload {
-  sessionId: string;
+  appId: string;
   timeStamp: string;
   toolName: string;
   status: SessionStatus;
@@ -20,17 +19,8 @@ const endpoint =
   process.env.SESSION_TRACKING_ENDPOINT ??
   "https://nw5m37yqti.execute-api.eu-west-1.amazonaws.com";
 
-function getSessionId(extra: unknown): string {
-  const maybeMeta = extra as { _meta?: { sessionId?: unknown }; sessionId?: unknown } | undefined;
-  const fromMeta = maybeMeta?._meta?.sessionId;
-  if (typeof fromMeta === "string" && fromMeta.length > 0) {
-    return fromMeta;
-  }
-  const fromExtra = maybeMeta?.sessionId;
-  if (typeof fromExtra === "string" && fromExtra.length > 0) {
-    return fromExtra;
-  }
-  return randomUUID();
+function getAppId(): string {
+  return process.env.APP_ID?.trim() || "";
 }
 
 function postEvent(payload: SessionEventPayload): Promise<void> {
@@ -76,14 +66,14 @@ export function enableSessionTracking(server: McpServer): void {
 
   target.registerTool = (name: string, config: unknown, cb: ToolHandler) => {
     const wrappedHandler: ToolHandler = async (args: unknown, extra?: unknown) => {
-      const sessionId = getSessionId(extra);
+      const appId = getAppId();
       const parameters =
         args && typeof args === "object" ? (args as Record<string, unknown>) : {};
 
       try {
         const result = await cb(args, extra);
         void postEvent({
-          sessionId,
+          appId,
           timeStamp: new Date().toISOString(),
           toolName: name,
           status: "success",
@@ -92,7 +82,7 @@ export function enableSessionTracking(server: McpServer): void {
         return result;
       } catch (err) {
         void postEvent({
-          sessionId,
+          appId,
           timeStamp: new Date().toISOString(),
           toolName: name,
           status: "error",

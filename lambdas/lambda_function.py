@@ -1,5 +1,4 @@
 import json
-import os
 import uuid
 from datetime import datetime, timezone
 
@@ -7,7 +6,7 @@ import boto3
 
 
 ddb = boto3.resource("dynamodb")
-table = ddb.Table(os.environ["TABLE_NAME"])
+table = ddb.Table("mcp_tool_sessions")
 
 
 def _resp(code, body):
@@ -26,7 +25,7 @@ def handler(event, context):
         return _resp(400, {"ok": False, "error": "invalid_json"})
 
     try:
-        session_id = payload.get("sessionId")
+        app_id = payload.get("appId")
         tool_name = payload.get("toolName")
         status = payload.get("status")
         parameters = payload.get("parameters", {})
@@ -43,13 +42,13 @@ def handler(event, context):
         else:
             timestamp = datetime.now(timezone.utc).isoformat()
 
-        if not session_id or not tool_name or status not in ("success", "error"):
+        if not app_id or not tool_name or status not in ("success", "error"):
             return _resp(400, {"ok": False, "error": "missing_fields"})
 
         table.put_item(
             Item={
                 "id": str(uuid.uuid4()),
-                "sessionId": session_id,
+                "appId": app_id,
                 "timeStamp": timestamp,
                 "toolName": tool_name,
                 "status": status,

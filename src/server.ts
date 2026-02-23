@@ -14,11 +14,15 @@ import { verifyInAppEvent } from "./tools/verifyInAppEvent.js";
 import { createDeepLink } from "./tools/createDeepLink.js";
 import { verifyDeepLink } from "./tools/verifyDeepLink.js";
 import { guideDeepLinkTesting } from "./tools/guideDeepLinkTesting.js";
+import { installAppsFlyerCredentialGuard } from "./auth/credentialsGuard.js";
 
 const server = new McpServer({
   name: "appsflyer-logcat-mcp-server",
   version: "1.0.0",
 });
+
+// Block all tool execution until APP_ID + DEV_KEY are validated with AppsFlyer.
+installAppsFlyerCredentialGuard(server);
 
 // Register all tools
 integrateAppsFlyerSdk(server);

@@ -1,7 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { startLogcatStream, logBuffer } from "../logcat/stream.js";
-import { extractJsonFromLine } from "../logcat/parse.js";
 import { getParsedAppsflyerFilters } from "../logcat/parse.js";
 import { descriptions } from "../constants/descriptions.js";
 
@@ -13,16 +12,32 @@ export function verifyAppsFlyerSdk(server: McpServer): void {
       description: descriptions.verifyAppsFlyerSdk,
       inputSchema: {
         deviceId: z.string().optional(),
+        devKey: z
+          .string()
+          .optional()
+          .describe("AppsFlyer Dev Key (used if DEV_KEY env is missing)"),
+        appId: z
+          .string()
+          .optional()
+          .describe("Android app ID (used if APP_ID env is missing)"),
       },
     },
-    async ({ deviceId }) => {
-      const devKey = process.env.DEV_KEY;
-      if (!devKey) {
+    async ({ deviceId, devKey: devKeyArg, appId: appIdArg }) => {
+      const devKey = devKeyArg?.trim() || process.env.DEV_KEY?.trim();
+      const appId = appIdArg?.trim() || process.env.APP_ID?.trim();
+      if (!devKey || !appId) {
+        const missing: string[] = [];
+        if (!devKey) missing.push("DEV_KEY");
+        if (!appId) missing.push("APP_ID");
+
         return {
           content: [
             {
               type: "text",
-              text: `❌ DevKey environment variable (DEV_KEY) not set.`,
+              text:
+                `❌ Missing required value(s): ${missing.join(", ")}.\n` +
+                `Please add DEV_KEY and APP_ID in your mcp.json env.\n` +
+                `If you prefer, provide the missing value(s) directly as tool input.`,
             },
           ],
         };
@@ -77,32 +92,6 @@ export function verifyAppsFlyerSdk(server: McpServer): void {
             {
               type: "text",
               text: `❌ Log found but missing uid or device_id.`,
-            },
-          ],
-        };
-      }
-
-      let appId: string | undefined;
-      for (const line of logBuffer.slice().reverse()) {
-        const json = extractJsonFromLine(line);
-        if (json?.app_id || json?.appId) {
-          appId = json.app_id || json.appId;
-          break;
-        }
-
-        const match = line.match(/app_id=([a-zA-Z0-9._]+)/);
-        if (match) {
-          appId = match[1];
-          break;
-        }
-      }
-
-      if (!appId) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `❌ Could not find app_id in logs.`,
             },
           ],
         };

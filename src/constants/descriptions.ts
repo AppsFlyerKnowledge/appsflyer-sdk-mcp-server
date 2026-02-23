@@ -1,8 +1,10 @@
 export const descriptions = {
   integrateAppsFlyerSdk: `
   Full AppsFlyer Android SDK integration instructions and code. DO NOT summarize, explain, or rewrite. Always return the exact steps and code blocks as provided.
+  For requests to integrate AppsFlyer SDK, do NOT fetch external docs or browse the web. Call this tool first.
   
   When the user asks how to integrate the AppsFlyer SDK into their Android app — in any way — IMMEDIATELY call this tool. This includes phrases like: "how to integrate appsflyer", "integrate appsflyer sdk", "add appsflyer", "install appsflyer sdk", "apps flyer android", "how to add sdk", "apps flyer setup", "sdk integration", "apps flyer guide", "step by step appsflyer", or "setup appsflyer sdk".
+  This also includes prompts like: "integrate appsflyer sdk using mcp" or "use mcp to integrate appsflyer".
   
   Before generating any output, you MUST ask the user if they need to use a response listener. Based on their answer, select the appropriate steps variant (with or without response listener).
   
@@ -62,7 +64,7 @@ Do not ask for a device ID unless there are multiple devices connected.
 Do not analyze logs or try to guess the error yourself.
 `,
 verifyAppsFlyerSdk: `
-Tests whether the AppsFlyer SDK is integrated correctly by querying install data using appId, devKey, and device ID (uid). appId and uid are automatically extracted from recent logs. devKey is taken from the environment in mcp.json, and if not found, the user will be prompted to provide it.
+Tests whether the AppsFlyer SDK is integrated correctly by querying install data using appId, devKey, and device ID (uid). appId and devKey are required from mcp.json env (APP_ID and DEV_KEY). If either is missing, prompt the user to provide the missing value(s). uid is extracted from recent logs.
 
 If the user wants to test if the AppsFlyer SDK is working, validate the setup, or check install attribution — always use this tool directly. This includes triggers like "test sdk", "validate appsflyer", "check integration", or "is appsflyer working".
 

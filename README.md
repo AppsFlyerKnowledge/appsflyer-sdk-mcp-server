@@ -20,6 +20,7 @@ A robust Model Context Protocol (MCP) server for integrating, testing, and valid
       - [SDK Integration Tools](#sdk-integration-tools)
       - [Log Analysis Tools](#log-analysis-tools)
       - [Testing \& Validation Tools](#testing--validation-tools)
+      - [Deep Link Tools](#deep-link-tools)
   - [Core Components](#core-components)
     - [SDK Integration](#sdk-integration)
     - [Log Analysis \& Event Validation](#log-analysis--event-validation)
@@ -89,7 +90,8 @@ Add the following to your `mcp.json` (in your IDE, e.g., Copilot/Cursor):
     "args": ["ABSOLUTE/PATH/mcp-AppsFlyer-sdk/dist/server.js"],
     "cwd": ".",
     "env": {
-      "DEV_KEY": "YOUR-DEV-KEY"
+      "DEV_KEY": "YOUR-DEV-KEY",
+      "APP_ID": "YOUR-APP-ID"
     }
   }
 }
@@ -99,9 +101,15 @@ Replace `ABSOLUTE/PATH` with the absolute path to your project directory.
 
 ### 2. Environment Variables
 
-* **DEV\_KEY**: Your AppsFlyer Dev Key (required for SDK validation)
+Set these values before running the server:
 
-  * Set in your environment or in your IDE's MCP configuration.
+* **Preferred**: in your IDE MCP config (`mcp.json` -> `env`) as shown above.
+* **Alternative**: as OS environment variables in your shell.
+
+Required variables:
+
+* **APP\_ID**: Your Android app ID (for example: `com.example.app`)
+* **DEV\_KEY**: Your AppsFlyer Dev Key (required for validation and verification tools)
 
 ---
 
@@ -137,8 +145,16 @@ The server exposes the following tools organized by functionality:
 
 | Tool Name          | Description                                                                           |
 | ------------------ | ------------------------------------------------------------------------------------- |
-| `testAppsFlyerSdk` | Validates SDK integration by querying install data using appId, devKey, and device ID |
-| `testInAppEvent`   | Validates if the in-app event was successfully triggered and logged                   |
+| `verifyAppsFlyerSdk` | Validates SDK integration by querying install data using appId, devKey, and device ID |
+| `verifyInAppEvent`   | Validates if a specific in-app event was successfully triggered and sent               |
+
+#### Deep Link Tools
+
+| Tool Name               | Description                                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
+| `createDeepLink`        | Guides setup of AppsFlyer OneLink deep linking in Android, including required config/code steps |
+| `guideDeepLinkTesting`  | Provides step-by-step testing instructions for deferred or direct deep links                     |
+| `verifyDeepLink`        | Validates deep-link handling from recent AppsFlyer logs and confirms callback status             |
 
 ---
 
@@ -216,6 +232,11 @@ Make sure the Android SDK is installed and `adb` is in the expected location:
 
 * Set your AppsFlyer Dev Key in your environment or IDE configuration
 * Verify the key is correctly formatted and active
+
+**APP\_ID not set:**
+
+* Set your Android app ID in your environment or IDE configuration
+* Verification requires APP\_ID and will prompt for it if missing
 
 **Multiple devices:**
 

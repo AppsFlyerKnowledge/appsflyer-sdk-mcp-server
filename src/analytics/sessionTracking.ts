@@ -6,6 +6,7 @@ type SessionStatus = "success" | "error";
 
 interface SessionEventPayload {
   appId: string;
+  os: string;
   timeStamp: string;
   toolName: string;
   status: SessionStatus;
@@ -74,6 +75,7 @@ export function enableSessionTracking(server: McpServer): void {
         const result = await cb(args, extra);
         void postEvent({
           appId,
+          os: "android",
           timeStamp: new Date().toISOString(),
           toolName: name,
           status: "success",
@@ -83,6 +85,7 @@ export function enableSessionTracking(server: McpServer): void {
       } catch (err) {
         void postEvent({
           appId,
+          os: "android",
           timeStamp: new Date().toISOString(),
           toolName: name,
           status: "error",

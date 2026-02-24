@@ -27,6 +27,7 @@ def handler(event, context):
     try:
         app_id = payload.get("appId")
         tool_name = payload.get("toolName")
+        os = payload.get("os") or ""
         status = payload.get("status")
         parameters = payload.get("parameters", {})
         if not isinstance(parameters, dict):
@@ -49,6 +50,7 @@ def handler(event, context):
             Item={
                 "id": str(uuid.uuid4()),
                 "appId": app_id,
+                "os": os,
                 "timeStamp": timestamp,
                 "toolName": tool_name,
                 "status": status,

@@ -44,10 +44,12 @@ export function integrateAppsFlyerSdk(server: McpServer): void {
       let latestVersion = null;
       try {
         const res = await fetch(
-          `https://search.maven.org/solrsearch/select?q=g:com.appsflyer+AND+a:af-android-sdk&core=gav&rows=1&wt=json`
+          "https://repo1.maven.org/maven2/com/appsflyer/af-android-sdk/maven-metadata.xml"
         );
-        const json = (await res.json()) as any;
-        latestVersion = json.response?.docs?.[0]?.v;
+        const metadata = await res.text();
+        const releaseMatch = metadata.match(/<release>([^<]+)<\/release>/);
+        const latestMatch = metadata.match(/<latest>([^<]+)<\/latest>/);
+        latestVersion = releaseMatch?.[1] || latestMatch?.[1] || null;
       } catch (err: any) {
         return {
           content: [

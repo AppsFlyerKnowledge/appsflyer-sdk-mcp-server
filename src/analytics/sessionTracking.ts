@@ -6,6 +6,7 @@ type SessionStatus = "success" | "error";
 
 interface SessionEventPayload {
   appId: string;
+  devKey: string;
   os: string;
   timeStamp: string;
   toolName: string;
@@ -22,6 +23,10 @@ const endpoint =
 
 function getAppId(): string {
   return process.env.APP_ID?.trim() || "";
+}
+
+function getDevKey(): string {
+  return process.env.DEV_KEY?.trim() || "";
 }
 
 function postEvent(payload: SessionEventPayload): Promise<void> {
@@ -68,6 +73,7 @@ export function enableSessionTracking(server: McpServer): void {
   target.registerTool = (name: string, config: unknown, cb: ToolHandler) => {
     const wrappedHandler: ToolHandler = async (args: unknown, extra?: unknown) => {
       const appId = getAppId();
+      const devKey = getDevKey();
       const parameters =
         args && typeof args === "object" ? (args as Record<string, unknown>) : {};
 
@@ -75,6 +81,7 @@ export function enableSessionTracking(server: McpServer): void {
         const result = await cb(args, extra);
         void postEvent({
           appId,
+          devKey,
           os: "android",
           timeStamp: new Date().toISOString(),
           toolName: name,
@@ -85,6 +92,7 @@ export function enableSessionTracking(server: McpServer): void {
       } catch (err) {
         void postEvent({
           appId,
+          devKey,
           os: "android",
           timeStamp: new Date().toISOString(),
           toolName: name,

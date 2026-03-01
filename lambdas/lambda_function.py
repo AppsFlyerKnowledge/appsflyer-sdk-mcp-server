@@ -40,7 +40,7 @@ def _get_cached_validation(cache_key):
         expires_at = int(item.get("expiresAt", 0))
         if expires_at <= int(time.time()):
             return None
-        return {"ok": bool(item.get("ok")), "message": item.get("message")}
+        return {"status": item.get("status"), "message": item.get("message")}
     except Exception as e:
         print(f"cache_get_error: {e}")
         return None
@@ -54,7 +54,7 @@ def _set_cached_validation(cache_key, result):
         cache_table.put_item(
             Item={
                 "id": cache_key,
-                "ok": bool(result.get("ok")),
+                "status": result.get("status"),
                 "message": result.get("message", ""),
                 "expiresAt": int(time.time()) + CACHE_TTL_SECONDS,
             }
@@ -78,18 +78,18 @@ def _validate_against_appsflyer(app_id, dev_key):
         body = e.read().decode("utf-8", errors="replace") if e.fp else ""
     except Exception as e:
         return {
-            "ok": False,
+            "status": "error",
             "message": f"credential_validation_error: {e}",
         }
 
     if status in (200, 404):
-        return {"ok": True}
+        return {"status": "success"}
     if status == 403:
-        return {"ok": False, "message": "credential_validation_forbidden"}
+        return {"status": "error", "message": "credential_validation_forbidden"}
 
     compact_body = " ".join(body.split())[:300]
     return {
-        "ok": False,
+        "status": "error",
         "message": f"credential_validation_http_{status}: {compact_body}",
     }
 
@@ -110,7 +110,7 @@ def handler(event, context):
         body = event.get("body") or "{}"
         payload = json.loads(body)
     except Exception:
-        return _resp(400, {"ok": False, "error": "invalid_json"})
+        return _resp(400, {"status": "error", "error": "invalid_json"})
 
     try:
         app_id = payload.get("appId")
@@ -138,14 +138,14 @@ def handler(event, context):
             or not tool_name
             or status not in ("success", "error")
         ):
-            return _resp(400, {"ok": False, "error": "missing_fields"})
+            return _resp(400, {"status": "error", "error": "missing_fields"})
 
         validation = _validate_credentials(app_id, dev_key)
-        if not validation.get("ok"):
+        if validation.get("status") != "success":
             return _resp(
                 403,
                 {
-                    "ok": False,
+                    "status": "error",
                     "error": "credential_validation_failed",
                     "details": validation.get("message"),
                 },
@@ -162,7 +162,7 @@ def handler(event, context):
                 "parameters": parameters,
             }
         )
-        return _resp(200, {"ok": True})
+        return _resp(200, {"status": "success"})
     except Exception as e:
         print(f"lambda_error: {e}")
-        return _resp(500, {"ok": False, "error": "lambda_exception"})
+        return _resp(500, {"status": "error", "error": "lambda_exception"})

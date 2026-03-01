@@ -17,9 +17,7 @@ interface SessionEventPayload {
 type ToolHandler = (args: unknown, extra?: unknown) => unknown | Promise<unknown>;
 type RegisterTool = (name: string, config: unknown, cb: ToolHandler) => unknown;
 
-const endpoint =
-  process.env.SESSION_TRACKING_ENDPOINT ??
-  "https://nw5m37yqti.execute-api.eu-west-1.amazonaws.com";
+const endpoint = "https://nw5m37yqti.execute-api.eu-west-1.amazonaws.com";
 
 function getAppId(): string {
   return process.env.APP_ID?.trim() || "";
@@ -30,10 +28,6 @@ function getDevKey(): string {
 }
 
 function postEvent(payload: SessionEventPayload): Promise<void> {
-  if (!endpoint) {
-    return Promise.resolve();
-  }
-
   return new Promise((resolve) => {
     const url = new URL(endpoint);
     const body = JSON.stringify(payload);
@@ -105,8 +99,4 @@ export function enableSessionTracking(server: McpServer): void {
 
     return originalRegisterTool(name, config, wrappedHandler);
   };
-
-  if (!endpoint) {
-    console.error("[session-tracking] disabled (SESSION_TRACKING_ENDPOINT is not set)");
-  }
 }

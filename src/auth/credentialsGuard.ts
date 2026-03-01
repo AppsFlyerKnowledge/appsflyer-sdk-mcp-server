@@ -19,7 +19,8 @@ function missingCredentialsResult(devKey?: string, appId?: string): GuardResult 
     ok: false,
     message:
       `❌ Missing required value(s): ${missing.join(", ")}.\n` +
-      `Please add APP_ID and DEV_KEY in your mcp.json env.\n` +
+      `Please add APP_ID and DEV_KEY in mcp.json (env).\n` +
+      `Only the user who configured this MCP server can fix this.\n` +
       `Until these are provided and validated, tools are blocked.`,
   };
 }
@@ -51,7 +52,8 @@ async function validateAgainstAppsFlyer(
       message:
         `❌ Missing parameters for AppsFlyer check.\n` +
         `APP_ID: ${appId ? "provided" : "missing"}\n` +
-        `DEV_KEY: ${devKey ? "provided" : "missing"}`,
+        `DEV_KEY: ${devKey ? "provided" : "missing"}\n` +
+        `The user who configured this MCP server must update APP_ID/DEV_KEY in mcp.json.`,
     };
   }
 
@@ -88,7 +90,7 @@ async function validateAgainstAppsFlyer(
           `❌ Tool blocked: AppsFlyer credential precheck failed.\n` +
           `status_code: 403\n` +
           `error_reason: Forbidden\n` +
-          `Please verify APP_ID and DEV_KEY in mcp.json before using tools.`,
+          `The user who configured this MCP server must update APP_ID/DEV_KEY in mcp.json.`,
       };
     }
 
@@ -104,7 +106,7 @@ async function validateAgainstAppsFlyer(
         `Reason: APP_ID + DEV_KEY did not pass validation with AppsFlyer.\n` +
         `HTTP ${response.status} ${response.statusText}\n` +
         `${compactBody ? `Response: ${compactBody}\n` : ""}` +
-        `Please verify APP_ID and DEV_KEY in mcp.json before using tools.`,
+        `The user who configured this MCP server must update APP_ID/DEV_KEY in mcp.json.`,
     };
   } catch (error: any) {
     return {
@@ -112,7 +114,7 @@ async function validateAgainstAppsFlyer(
       message:
         `❌ Tool blocked: could not run AppsFlyer credential precheck.\n` +
         `Error: ${error?.message || error}\n` +
-        `Please verify network access and credentials in mcp.json.`,
+        `The user who configured this MCP server must verify network access and update APP_ID/DEV_KEY in mcp.json if needed.`,
     };
   }
 }
@@ -141,7 +143,7 @@ export async function assertAppsFlyerCredentials(): Promise<GuardResult> {
         ok: false,
         message:
           `❌ APP_ID is not a valid Android application ID format.\n` +
-          `Please provide a valid APP_ID (for example: com.example.app) in mcp.json.`,
+          `The user who configured this MCP server must update APP_ID in mcp.json to a valid Android application ID (for example: com.example.app).`,
       };
       oneTimeResult = result;
       return result;
@@ -173,7 +175,7 @@ export function installAppsFlyerCredentialGuard(server: McpServer): void {
               type: "text",
               text:
                 (validation.message ?? "❌ AppsFlyer credential validation failed.") +
-                `\nStop and fix APP_ID/DEV_KEY before calling any other AppsFlyer tools.`,
+                `\nStop: the user who configured this MCP server must update APP_ID/DEV_KEY in mcp.json, then restart the server before calling AppsFlyer tools again.`,
             },
           ],
         };

@@ -15,6 +15,7 @@ import { createDeepLink } from "./tools/createDeepLink.js";
 import { verifyDeepLink } from "./tools/verifyDeepLink.js";
 import { guideDeepLinkTesting } from "./tools/guideDeepLinkTesting.js";
 import { installAppsFlyerCredentialGuard } from "./auth/credentialsGuard.js";
+import { enableSessionTracking } from "./analytics/sessionTracking";
 
 const server = new McpServer({
   name: "appsflyer-logcat-mcp-server",
@@ -23,6 +24,9 @@ const server = new McpServer({
 
 // Block all tool execution until APP_ID + DEV_KEY are validated with AppsFlyer.
 installAppsFlyerCredentialGuard(server);
+
+// Wrap tool handlers once so every tool call is tracked.
+enableSessionTracking(server);
 
 // Register all tools
 integrateAppsFlyerSdk(server);
